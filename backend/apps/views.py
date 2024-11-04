@@ -1,12 +1,10 @@
 from django.shortcuts import render
-from environs import Env
-import os
+from rest_framework import viewsets
+
+from .models import Image
+from .serializers import ImageSerializer
 
 
-env = Env()
-env.read_env()
-
-print(env("SECRET_KEY"))
-
-
-# Create your views here.
+class ImageViewSet(viewsets.ModelViewSet):
+    queryset = Image.objects.all()
+    serializer_class = ImageSerializer

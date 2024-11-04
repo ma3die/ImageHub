@@ -8,6 +8,8 @@ class Image(models.Model):
     resolution = models.CharField(max_length=255, verbose_name="Разрешение")
     size = models.IntegerField(verbose_name="Размер файла")
 
+    objects = models.Manager()
+
     class Meta:
         verbose_name = "Изображение"
         verbose_name_plural = "Изображения"
