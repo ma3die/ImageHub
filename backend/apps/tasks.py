@@ -5,6 +5,7 @@ from celery import shared_task
 from PIL import Image as PILImage
 from django.core.files.base import ContentFile
 from django.conf import settings
+from loguru import logger
 
 from .models import Image
 
@@ -15,13 +16,14 @@ def save_resized_image(original_image: PILImage, size: tuple[int, int], name: st
     try:
         resized_img = original_image.resize(size).convert("L")
         resized_path = base_dir / f"{name}_{size[0]}x{size[1]}.jpg"
+        logger.info(f"resized_path {resized_path}")
         resized_img.save(resized_path, format="JPEG")
         return resized_path, resized_img.size, os.path.getsize(resized_path)
     except Exception:
         return None
 
 
-@shared_task
+# @shared_task
 def process_image(file_path: str, name: str) -> None:
     try:
         with PILImage.open(file_path) as img:
@@ -36,6 +38,8 @@ def process_image(file_path: str, name: str) -> None:
                     processed_files.append(result)
 
             for path, res, size in processed_files:
+                logger.info(f"path.stem {path.stem}")
+                logger.info(f"name {name}")
                 Image.objects.create(
                     name=f"{name}_{path.stem}",
                     file_path=str(path),
@@ -44,3 +48,5 @@ def process_image(file_path: str, name: str) -> None:
                 )
     except Exception:
         pass
+
+# celery -A backend worker -l info
