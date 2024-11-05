@@ -49,6 +49,7 @@ class ImageViewSet(viewsets.ModelViewSet):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
     permission_classes = [IsAuthenticated]
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def create(self, request, *args, **kwargs):
         file = request.FILES["file"]

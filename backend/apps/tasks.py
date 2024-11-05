@@ -41,7 +41,7 @@ def process_image(file_path: str, name: str) -> None:
                 logger.info(f"path.stem {path.stem}")
                 logger.info(f"name {name}")
                 Image.objects.create(
-                    name=f"{name}_{path.stem}",
+                    name=f"{path.stem}",
                     file_path=str(path),
                     resolution=f"{res[0]}x{res[1]}",
                     size=size
