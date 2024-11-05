@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      args:
+        SERVICE: web  # Передаем аргумент для сборки веб-приложения
+    ports:
+      - "8000:8000"
+    depends_on:
+      - rabbitmq
+      - db
+    volumes:
+      - .:/app  # Связываем локальную директорию с контейнером
+    env_file:
+      - .env  # Загружаем переменные окружения из .env
+
+  image_processor:
+    build:
+      context: .
+      args:
+        SERVICE: image_processor  # Передаем аргумент для сборки сервиса обработки изображений
+    depends_on:
+      - rabbitmq  # Убедитесь, что RabbitMQ запущен перед сервисом
+    env_file:
+      - .env  # Загружаем переменные окружения из .env
+
+  db:
+    image: postgres:13
+    env_file:
+      - .env  # Загружаем переменные окружения из .env
+#    environment:
+#      POSTGRES_DB: ${POSTGRES_DB}
+#      POSTGRES_USER: ${POSTGRES_USER}
+#      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    env_file:
+      - .env  # Загружаем переменные окружения из .env
+    ports:
+      - "5672:5672"
+      - "15672:15672"  # Веб-интерфейс RabbitMQ
+
+volumes:
+  postgres_data:
