@@ -2,20 +2,42 @@ import os
 from django.shortcuts import render
 from django.conf import settings
 from django.core.files.storage import default_storage, FileSystemStorage
-from rest_framework import viewsets, status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import viewsets, status, generics
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from loguru import logger
 
 from .models import Image
-from .serializers import ImageSerializer
+from .serializers import ImageSerializer, RegisterSerializer, UserSerializer
 from .tasks import process_image, del_file
+
+class RegisterView(generics.GenericAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = RegisterSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        return Response({
+            "user": UserSerializer(user, context=self.get_serializer_context()).data,
+            "message": "User successfully created."
+        })
+
+class ProfileView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
+
+    def get(self, request, *args, **kwargs):
+        return Response({
+            "user": UserSerializer(request.user, context=self.get_serializer_context()).data,
+        })
 
 
 class ImageViewSet(viewsets.ModelViewSet):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         file = request.FILES["file"]
