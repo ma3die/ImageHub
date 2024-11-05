@@ -7,6 +7,7 @@ from rest_framework import viewsets, status, generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.response import Response
+from drf_spectacular.utils import OpenApiExample, extend_schema
 from loguru import logger
 
 from .models import Image
@@ -46,11 +47,29 @@ class ProfileViewSet(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, vi
 
 
 class ImageViewSet(viewsets.ModelViewSet):
+    """
+        API endpoint for viewing and editing image instances.
+        """
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
     permission_classes = [IsAuthenticated]
     http_method_names = ['get', 'post', 'patch', 'delete']
 
+    # @extend_schema(
+    #     request=ImageSerializer,
+    #     responses={201: ImageSerializer},
+    #     examples=[
+    #         OpenApiExample(
+    #             'Example Create Image',
+    #             value={
+    #                 'name': 'test_image',
+    #                 # 'file_path': '/images/test_image.jpg',
+    #                 # 'resolution': '500x500',
+    #                 # 'size': 1024
+    #             }
+    #         )
+    #     ]
+    # )
     def create(self, request, *args, **kwargs):
         file = request.FILES["file"]
         name = request.POST.get("name", "Untitled")

@@ -10,6 +10,7 @@ def send_rabbitmq_message(message: str):
         connection = pika.BlockingConnection(
             pika.ConnectionParameters(host=settings.RABBITMQ_HOST, port=settings.RABBITMQ_PORT, credentials=credentials)
         )
+        # , port = settings.RABBITMQ_PORT, credentials = credentials
         channel = connection.channel()
 
         # Создание очереди, если она ещё не создана

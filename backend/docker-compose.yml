@@ -9,8 +9,10 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - rabbitmq
-      - db
+      rabbitmq:
+        condition: "service_healthy"
+      db:
+        condition: "service_started"
     volumes:
       - .:/app  # Связываем локальную директорию с контейнером
     env_file:
@@ -22,13 +24,15 @@ services:
       args:
         SERVICE: image_processor  # Передаем аргумент для сборки сервиса обработки изображений
     depends_on:
-      - rabbitmq  # Убедитесь, что RabbitMQ запущен перед сервисом
+      rabbitmq:
+        condition: "service_healthy" # Убедитесь, что RabbitMQ запущен перед сервисом
     env_file:
       - .env  # Загружаем переменные окружения из .env
 
   db:
     image: postgres:13
     restart: always
+    container_name: "postgres"
     env_file:
       - .env  # Загружаем переменные окружения из .env
 #    environment:
@@ -40,6 +44,12 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management
+    container_name: "rabbitmq"
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "check_running" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     env_file:
       - .env  # Загружаем переменные окружения из .env
     ports:

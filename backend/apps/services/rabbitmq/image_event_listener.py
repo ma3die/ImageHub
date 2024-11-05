@@ -18,6 +18,7 @@ def start_listening():
     connection = pika.BlockingConnection(
         pika.ConnectionParameters(host=RABBITMQ_HOST, port=RABBITMQ_PORT, credentials=credentials)
     )
+    # , port = RABBITMQ_PORT, credentials = credentials
     channel = connection.channel()
 
     # Подписываемся на очередь
