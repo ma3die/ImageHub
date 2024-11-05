@@ -7,7 +7,7 @@ router = DefaultRouter()
 router.register(r'images', ImageViewSet)
 
 urlpatterns = [
-    path('', include(router.urls))
-    path("api/token/", TokenObtainPairView.as_view(), name="token"),
-    path("api/refresh_token/", TokenRefreshView.as_view(), name="refresh_token"),
+    path('', include(router.urls)),
+    path("token/", TokenObtainPairView.as_view(), name="token"),
+    path("refresh_token/", TokenRefreshView.as_view(), name="refresh_token"),
 ]

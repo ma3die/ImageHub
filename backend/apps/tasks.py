@@ -46,7 +46,18 @@ def process_image(file_path: str, name: str) -> None:
                     resolution=f"{res[0]}x{res[1]}",
                     size=size
                 )
-    except Exception:
-        pass
+    except Exception as e:
+        logger.error(f"Achtung!!! {e}")
+
+def del_file(file_name: str) -> None:
+    os.remove(file_name)
+    # logger.info(f"path del {Path(settings.MEDIA_ROOT)}")
+    # folder = Path(settings.MEDIA_ROOT)
+    # logger.info(file_name)
+    # for item in folder.iterdir():
+    #     if item.is_file() and item == file_name:
+    #         item.unlink()
+    #     elif item.is_dir():
+    #         continue
 
 # celery -A backend worker -l info
