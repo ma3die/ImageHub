@@ -28,6 +28,7 @@ services:
 
   db:
     image: postgres:13
+    restart: always
     env_file:
       - .env  # Загружаем переменные окружения из .env
 #    environment:
