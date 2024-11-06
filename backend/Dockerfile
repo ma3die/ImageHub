@@ -3,6 +3,7 @@ FROM python:3.10-slim
 
 # Установим необходимые системные зависимости
 RUN apt-get update && apt-get install -y \
+    libmagic1 \
     build-essential \
     python3-dev \
     libpq-dev \

@@ -5,7 +5,7 @@ from loguru import logger
 from apps.services.services import retry
 
 
-@retry(exceptions=(ConnectionError,))
+@retry(exceptions=(ConnectionError, OSError))
 def send_rabbitmq_message(message: str):
     """Отправляет сообщение в очередь RabbitMQ."""
     try:
@@ -29,4 +29,5 @@ def send_rabbitmq_message(message: str):
         connection.close()
 
     except Exception as e:
+        logger.error(e)
         logger.error(f"Ошибка при отправке сообщения в RabbitMQ: {e}")
