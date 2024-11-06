@@ -19,7 +19,6 @@ def save_resized_image(
     try:
         resized_img = original_image.resize(size).convert("L")
         resized_path = base_dir / f"{name}_{size[0]}x{size[1]}.jpg"
-        logger.info(f"resized_path {resized_path}")
         resized_img.save(resized_path, format="JPEG")
         file_size = os.path.getsize(resized_path)
         logger.info(f"Сохранено измененное изображение по адресу {resized_path} с размером {file_size} байт")
@@ -45,8 +44,6 @@ def process_image(file_path: str | bytes, name: str) -> None:
                     logger.warning(f"Не удалось обработать размер изображения {size} для {file_path}")
 
             for path, res, size in processed_files:
-                logger.info(f"path.stem {path.stem}")
-                logger.info(f"name {name}")
                 Image.objects.create(
                     name=f"{path.stem}",
                     file_path=str(path),
@@ -60,15 +57,15 @@ def process_image(file_path: str | bytes, name: str) -> None:
         logger.error(f"Произошла ошибка в process_image: {e}")
 
 
+@shared_task()
 def del_file(file_name: str | bytes) -> None:
     """Удаляет файл и обрабатывает исключения."""
     try:
         os.remove(file_name)
-        logger.info(f"Deleted file: {file_name}")
+        logger.info(f"Удаляет файл: {file_name}")
     except FileNotFoundError:
         logger.warning(f"Файл не найден для удаления: {file_name}")
     except OSError as e:
         logger.error(f"Ошибка удаления файла {file_name}: {e}")
 
-
-# celery -A backend worker -l info
+# celery -A backend worker -l info --pool=solo

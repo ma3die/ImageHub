@@ -3,6 +3,8 @@ from functools import wraps
 from loguru import logger
 
 import magic
+
+
 def get_mime_type(file):
     """Функция для проверки типа фаула"""
     initial_pos = file.tell()
@@ -11,6 +13,7 @@ def get_mime_type(file):
     file.seek(initial_pos)
     file_type = mime_type.split('/')[0]
     return file_type
+
 
 def retry(times=3, delay=1, exceptions=(Exception,)):
     def decorator(func):
@@ -27,5 +30,7 @@ def retry(times=3, delay=1, exceptions=(Exception,)):
                         raise
                     time.sleep(delay)
                     print(f"Retrying {func.__name__} due to {e}. Attempt {attempt}/{times}")
+
         return wrapper
+
     return decorator

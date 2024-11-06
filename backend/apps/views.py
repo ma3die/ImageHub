@@ -6,7 +6,6 @@ from rest_framework import viewsets, status, generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.response import Response
-from drf_spectacular.utils import OpenApiExample, extend_schema
 from loguru import logger
 
 from .models import Image
@@ -52,21 +51,6 @@ class ImageViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     http_method_names = ['get', 'post', 'patch', 'delete']
 
-    # @extend_schema(
-    #     request=ImageSerializer,
-    #     responses={201: ImageSerializer},
-    #     examples=[
-    #         OpenApiExample(
-    #             'Example Create Image',
-    #             value={
-    #                 'name': 'test_image',
-    #                 # 'file_path': '/images/test_image.jpg',
-    #                 # 'resolution': '500x500',
-    #                 # 'size': 1024
-    #             }
-    #         )
-    #     ]
-    # )
     def create(self, request, *args, **kwargs):
         """Создание изображения."""
         file = request.FILES["file"]
@@ -81,10 +65,8 @@ class ImageViewSet(viewsets.ModelViewSet):
         fs = FileSystemStorage()
         file_name = fs.save(file.name, file)
         file_path = os.path.join(settings.MEDIA_ROOT, file_name)
-        # process_image.delay(file.temporary_file_path(), name)
         try:
-            process_image(file_path, name)
-
+            process_image.delay(file_path, name)
             send_rabbitmq_message(f"Image uploaded: {name}")
             return Response({'status': 'image upload started'}, status=status.HTTP_201_CREATED)
         except Exception as e:
@@ -94,7 +76,7 @@ class ImageViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         finally:
-            del_file(file_path)
+            del_file.delay(file_path)
 
     def update(self, request, *args, **kwargs):
         """Обновление информации об изображении."""
