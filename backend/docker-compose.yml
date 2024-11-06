@@ -13,6 +13,8 @@ services:
         condition: "service_healthy"
       db:
         condition: "service_started"
+      redis:
+        condition: "service_healthy"
     volumes:
       - .:/app  # Связываем локальную директорию с контейнером
     env_file:
@@ -26,8 +28,33 @@ services:
     depends_on:
       rabbitmq:
         condition: "service_healthy" # Убедитесь, что RabbitMQ запущен перед сервисом
+      redis:
+        condition: "service_healthy"
     env_file:
       - .env  # Загружаем переменные окружения из .env
+
+  celery:
+    build:
+      context: .
+    command: celery -A backend worker -l info --pool=solo
+    depends_on:
+      - redis
+      - db
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+
+  redis:
+    image: redis:alpine
+    container_name: "redis"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "6379:6379"
 
   db:
     image: postgres:13
@@ -35,10 +62,6 @@ services:
     container_name: "postgres"
     env_file:
       - .env  # Загружаем переменные окружения из .env
-#    environment:
-#      POSTGRES_DB: ${POSTGRES_DB}
-#      POSTGRES_USER: ${POSTGRES_USER}
-#      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
