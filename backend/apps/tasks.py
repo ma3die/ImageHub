@@ -3,7 +3,6 @@ from pathlib import Path
 
 from celery import shared_task
 from PIL import Image as PILImage
-from django.core.files.base import ContentFile
 from django.conf import settings
 from loguru import logger
 
@@ -23,8 +22,8 @@ def save_resized_image(original_image: PILImage, size: tuple[int, int], name: st
         return None
 
 
-# @shared_task
-def process_image(file_path: str, name: str) -> None:
+@shared_task
+def process_image(file_path: str | bytes, name: str) -> None:
     try:
         with PILImage.open(file_path) as img:
             base_dir = Path(settings.MEDIA_ROOT) / 'images' / name
@@ -49,15 +48,9 @@ def process_image(file_path: str, name: str) -> None:
     except Exception as e:
         logger.error(f"Achtung!!! {e}")
 
-def del_file(file_name: str) -> None:
+
+def del_file(file_name: str | bytes) -> None:
     os.remove(file_name)
-    # logger.info(f"path del {Path(settings.MEDIA_ROOT)}")
-    # folder = Path(settings.MEDIA_ROOT)
-    # logger.info(file_name)
-    # for item in folder.iterdir():
-    #     if item.is_file() and item == file_name:
-    #         item.unlink()
-    #     elif item.is_dir():
-    #         continue
+
 
 # celery -A backend worker -l info

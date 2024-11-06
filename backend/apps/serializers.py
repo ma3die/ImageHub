@@ -18,9 +18,6 @@ class ImageSerializer(serializers.ModelSerializer):
         return fields
 
 
-
-
-
 class RegisterSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         validators=[

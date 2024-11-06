@@ -10,14 +10,13 @@ import io
 
 class ImageViewSetTests(TestCase):
     def setUp(self):
-        # Настройка пользователя и клиента
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', password='testpassword')
         self.client.force_authenticate(user=self.user)
 
     def generate_test_image(self):
         """Генерирует изображение в формате JPEG и возвращает его как файл."""
-        image = PILImage.new("RGB", (100, 100), color="red")  # Создаем простое изображение 100x100
+        image = PILImage.new("RGB", (100, 100), color="red")
         image_file = io.BytesIO()
         image.save(image_file, format="JPEG")
         image_file.name = 'test_image.jpg'
@@ -25,12 +24,11 @@ class ImageViewSetTests(TestCase):
         return image_file
 
     def test_upload_image(self):
-        url = reverse('image-list')  # URL для загрузки изображения
+        url = reverse('image-list')
         image_file = self.generate_test_image()
         data = {'file': image_file, 'name': 'test_image'}
         response = self.client.post(url, data, format='multipart')
 
-        # Проверка успешности загрузки
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(Image.objects.filter(name='test_image_500x500').exists())
 
@@ -44,6 +42,5 @@ class ImageViewSetTests(TestCase):
         url = reverse('image-detail', args=[image.id])
         response = self.client.delete(url)
 
-        # Проверка успешного удаления
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Image.objects.filter(id=image.id).exists())
