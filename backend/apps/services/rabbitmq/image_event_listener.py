@@ -1,12 +1,16 @@
 import pika
 from loguru import logger
+from environs import Env
+
+env = Env()
+env.read_env()
 
 # Конфигурация RabbitMQ
-RABBITMQ_HOST = "localhost"  # Используйте свои настройки подключения
-RABBITMQ_PORT = 5672
-RABBITMQ_USER = "guest"
-RABBITMQ_PASSWORD = "guest"
-RABBITMQ_QUEUE = "image_events"
+RABBITMQ_HOST = env("RABBITMQ_HOST")
+RABBITMQ_PORT = env("RABBITMQ_PORT")
+RABBITMQ_USER = env("RABBITMQ_USER")
+RABBITMQ_PASSWORD = env("RABBITMQ_PASSWORD")
+RABBITMQ_QUEUE = env("RABBITMQ_QUEUE")
 
 def callback(ch, method, properties, body):
     """Обработчик входящих сообщений."""
@@ -30,3 +34,7 @@ def start_listening():
 
 if __name__ == "__main__":
     start_listening()
+
+# docker-compose exec rabbitmq rabbitmqctl list_users
+# docker-compose down -v
+# docker-compose up --build

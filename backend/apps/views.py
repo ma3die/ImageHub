@@ -89,7 +89,7 @@ class ImageViewSet(viewsets.ModelViewSet):
         process_image(file_path, name)
         del_file(file_path)
 
-        # send_rabbitmq_message(f"Image uploaded: {name}")
+        send_rabbitmq_message(f"Image uploaded: {name}")
 
         return Response({'status': 'image upload started'}, status=status.HTTP_201_CREATED)
 
@@ -99,13 +99,13 @@ class ImageViewSet(viewsets.ModelViewSet):
 
         # Отправка сообщения об обновлении изображения
         image = self.get_object()
-        # send_rabbitmq_message(f"Image updated: {image.name}")
-        return Response(response)
+        send_rabbitmq_message(f"Image updated: {image.name}")
+        return response
 
     def destroy(self, request, *args, **kwargs):
         # Логика удаления изображения
         image = self.get_object()
-        # send_rabbitmq_message(f"Image deleted: {image.name}")
+        send_rabbitmq_message(f"Image deleted: {image.name}")
         try:
             super().destroy(request, *args, **kwargs)
             return Response(data={'message': 'Deleted'}, status=status.HTTP_204_NO_CONTENT)

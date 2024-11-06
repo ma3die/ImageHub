@@ -31,4 +31,4 @@ def send_rabbitmq_message(message: str):
     except Exception as e:
         logger.error(f"Ошибка при отправке сообщения в RabbitMQ: {e}")
 
-print(settings.RABBITMQ_USER, settings.RABBITMQ_PASSWORD)
+# print(settings.RABBITMQ_USER, settings.RABBITMQ_PASSWORD)
