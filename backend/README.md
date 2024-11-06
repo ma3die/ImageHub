@@ -27,6 +27,8 @@ git clone https://github.com/ma3die/ImageHub.git
 2. Создайте файл `.env` в корне проекта и добавьте следующие переменные окружения:
 
    ```env
+   SECRET_KEY=''
+   
    # Настройки PostgreSQL
    POSTGRES_HOST=''
    POSTGRES_DB=''
