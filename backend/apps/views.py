@@ -98,10 +98,17 @@ class ImageViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         """Обновление информации об изображении."""
-        response = super().update(request, *args, **kwargs)
-        image = self.get_object()
-        send_rabbitmq_message(f"Image updated: {image.name}")
-        return response
+        try:
+            response = super().update(request, *args, **kwargs)
+            image = self.get_object()
+            send_rabbitmq_message(f"Image updated: {image.name}")
+            return response
+        except Exception as e:
+            logger.error(f"Error updating image: {e}")
+            return Response(
+                {"error": "Failed to update image"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     def destroy(self, request, *args, **kwargs):
         """Удаление изображения."""
