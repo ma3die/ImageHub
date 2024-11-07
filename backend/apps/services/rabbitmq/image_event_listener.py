@@ -35,6 +35,4 @@ def start_listening():
 if __name__ == "__main__":
     start_listening()
 
-# docker-compose exec rabbitmq rabbitmqctl list_users
-# docker-compose down -v
-# docker-compose up --build
+

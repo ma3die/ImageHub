@@ -68,4 +68,3 @@ def del_file(file_name: str | bytes) -> None:
     except OSError as e:
         logger.error(f"Ошибка удаления файла {file_name}: {e}")
 
-# celery -A backend worker -l info --pool=solo
